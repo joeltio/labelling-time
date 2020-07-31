@@ -5,6 +5,8 @@ import Layout from '../components/Layout';
 import SEO from '../components/SEO';
 import FileUpload from '../components/FileUpload';
 
+import styles from './index.module.css';
+
 type DataProps = {
     site: {
         siteMetadata: {
@@ -20,7 +22,7 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
             'labeller',
             {
                 state: {
-                    files,
+                    file: files.item(0),
                 },
             },
         );
@@ -29,8 +31,27 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
     return (
         <Layout>
             <SEO title="Home" />
-            <FileUpload onUpload={onUpload} />
-            <p>{data.site.siteMetadata.description}</p>
+            <div className={styles.container}>
+                <FileUpload id="upload" onUpload={onUpload} />
+                <div className={styles.content}>
+                    <p>
+                        <i>Labelling Time</i>
+                        {' '}
+                        is a tool for labelling time series data. It provides an
+                        interactive way to label multiple classes of data and allows
+                        you to select specific columns of data from your CSV file.
+                    </p>
+                    <p>
+                        All processing is done on your browser, so no data is sent or
+                        stored anywhere outside your browser. To get a closer look at
+                        the code, check out the GitHub page of this website:
+                        {' '}
+                        <a href="https://github.com/joeltio/labelling-time">
+                            https://github.com/joeltio/labelling-time
+                        </a>
+                    </p>
+                </div>
+            </div>
         </Layout>
     );
 };

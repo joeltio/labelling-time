@@ -21,26 +21,25 @@ const Layout: React.FC<PropTypes> = ({ children }) => {
     `);
 
     return (
-        <>
+        <div
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
             <Header siteTitle={data.site.siteMetadata.title} />
             <div
                 style={{
+                    height: '100%',
                     margin: '0 auto',
                     maxWidth: 960,
-                    padding: '0 1.0875rem 1.45rem',
+                    flexGrow: 1,
                 }}
             >
                 <main>{children}</main>
-                <footer>
-                    ©
-                    {' '}
-                    {new Date().getFullYear()}
-                    , Built with
-                    {' '}
-                    <a href="https://www.gatsbyjs.org">Gatsby</a>
-                </footer>
             </div>
-        </>
+        </div>
     );
 };
 
