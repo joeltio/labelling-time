@@ -6,7 +6,7 @@
         "indent": ["error", 4],
         "react/jsx-indent" : ["error", 4],
         "react/jsx-indent-props" : ["error", "first"],
-        "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", "ts", "tsx"] }],
+        "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
         "react/prop-types": "off",
         "import/extensions": [
             "error",
