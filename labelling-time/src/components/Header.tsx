@@ -1,15 +1,22 @@
 import React from 'react';
 import { Link } from 'gatsby';
 
+import styles from './header.module.css';
+
 type PropTypes = {
     siteTitle: string,
 }
 
 const Header: React.FC<PropTypes> = ({ siteTitle = '' }) => (
     <header>
-        <div>
-            <h1>
-                <Link to="/">{siteTitle}</Link>
+        <div className={styles.container}>
+            <h1 className={styles.title}>
+                <Link
+                    className={styles.titleLink}
+                    to="/"
+                >
+                    {siteTitle}
+                </Link>
             </h1>
         </div>
     </header>
