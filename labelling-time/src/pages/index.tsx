@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PageProps, graphql, navigate } from 'gatsby';
 
 import Layout from '../components/Layout';
 import SEO from '../components/SEO';
+import Card from '../components/Card';
+import CardStep from '../components/CardStep';
+import FileUpload from '../components/FileUpload';
 
 import styles from './index.module.css';
-import Card from '../components/Card';
+import { useCSVFile } from '../utils/parseCSV';
+import HeaderSelect from '../components/HeaderSelect';
 
 type DataProps = {
     site: {
@@ -16,6 +20,20 @@ type DataProps = {
 }
 
 const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
+    const [step, setStep] = useState<number>(0);
+    const [file, setFile] = useState<File | null>(null);
+    const fileData = useCSVFile(file, 'utf-8');
+
+    const onUpload = (files: FileList) => {
+        setFile(files.item(0));
+        setStep(1);
+    };
+
+    if (fileData !== null && fileData.status === 'success') {
+        console.log(fileData.data[0]);
+    }
+
+    // Create functions to open other pages
     const { site: { siteMetadata: { githubURL } } } = data;
     const openDocs = () => {
         navigate('/documentation');
@@ -58,6 +76,21 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                         GitHub
                     </Card>
                 </div>
+                <CardStep step={step} className={styles.cardStep}>
+                    <div>
+                        <h2>Step 1</h2>
+                        <div className={styles.stepBody}>
+                            <p>Upload your CSV file</p>
+                            <FileUpload id="data_file" onUpload={onUpload} />
+                        </div>
+                    </div>
+                    <div>
+                        <h2>Step 2</h2>
+                        <div className={styles.stepBody}>
+                            <p>Pick the axis</p>
+                        </div>
+                    </div>
+                </CardStep>
             </div>
         </Layout>
     );
