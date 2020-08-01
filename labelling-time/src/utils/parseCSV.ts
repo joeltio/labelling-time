@@ -24,14 +24,21 @@ function parseCSV(
 }
 
 function useFile(
-    file: File,
+    file: File | null,
     encoding: Encoding,
-): FileResult<string> {
-    const [result, setResult] = useState<FileResult<string>>({
-        status: 'loading',
-    });
+): FileResult<string> | null {
+    const [result, setResult] = useState<FileResult<string> | null>(null);
 
     useEffect(() => {
+        if (file === null) {
+            return () => {};
+        }
+
+        // Start to load file
+        setResult({
+            status: 'loading',
+        });
+
         const fileReader = new FileReader();
         // On successful load
         const loadListener = (event: Event) => {
@@ -66,10 +73,15 @@ function useFile(
 }
 
 function useCSVFile(
-    file: File,
+    file: File | null,
     encoding: Encoding,
-): FileResult<CSVEntry[]> {
+): FileResult<CSVEntry[]> | null {
     const result = useFile(file, encoding);
+
+    if (result === null) {
+        return null;
+    }
+
     if (result.status === 'success') {
         // Convert the data to CSV entries
         return {
