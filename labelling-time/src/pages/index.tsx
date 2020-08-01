@@ -3,36 +3,33 @@ import { PageProps, graphql, navigate } from 'gatsby';
 
 import Layout from '../components/Layout';
 import SEO from '../components/SEO';
-import FileUpload from '../components/FileUpload';
 
 import styles from './index.module.css';
+import Card from '../components/Card';
 
 type DataProps = {
     site: {
         siteMetadata: {
-            title: string,
-            description: string,
+            githubURL: string,
         },
     },
-};
+}
 
 const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
-    const onUpload = (files: FileList) => {
-        navigate(
-            'labeller',
-            {
-                state: {
-                    file: files.item(0),
-                },
-            },
-        );
+    const { site: { siteMetadata: { githubURL } } } = data;
+    const openDocs = () => {
+        navigate('/documentation');
+    };
+
+    const openGitHub = () => {
+        window.open(githubURL, '_blank');
     };
 
     return (
         <Layout>
             <SEO title="Home" />
             <div className={styles.container}>
-                <FileUpload id="upload" onUpload={onUpload} />
+                <h1>Labelling Time</h1>
                 <div className={styles.content}>
                     <p>
                         <i>Labelling Time</i>
@@ -44,12 +41,22 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                     <p>
                         All processing is done on your browser, so no data is sent or
                         stored anywhere outside your browser. To get a closer look at
-                        the code, check out the GitHub page of this website:
-                        {' '}
-                        <a href="https://github.com/joeltio/labelling-time">
-                            https://github.com/joeltio/labelling-time
-                        </a>
+                        the code, check out the GitHub page of this website.
                     </p>
+                </div>
+                <div className={styles.links}>
+                    <Card
+                        className={styles.cardLeft}
+                        onClick={() => openDocs()}
+                    >
+                        Documentation
+                    </Card>
+                    <Card
+                        className={styles.cardRight}
+                        onClick={() => openGitHub()}
+                    >
+                        GitHub
+                    </Card>
                 </div>
             </div>
         </Layout>
@@ -57,11 +64,10 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
 };
 
 export const query = graphql`
-    {
+    query {
         site {
             siteMetadata {
-                title
-                description
+                githubURL
             }
         }
     }

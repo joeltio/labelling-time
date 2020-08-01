@@ -3,6 +3,7 @@ module.exports = {
         title: 'Labelling Time',
         description: 'Labelling Time is a tool to for labelling time series data.',
         author: '@joeltio',
+        githubURL: 'https://github.com/joeltio/labelling-time',
     },
     plugins: [
         'gatsby-plugin-react-helmet',
