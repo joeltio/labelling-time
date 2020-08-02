@@ -48,7 +48,7 @@ const CardStep: React.FC<PropTypes> = ({
     return (
         <div>
             <div>
-                <h2>{`Step: ${stepNum}`}</h2>
+                <h2>{`Step ${stepNum}`}</h2>
                 <div className={className}>
                     {children}
                 </div>
