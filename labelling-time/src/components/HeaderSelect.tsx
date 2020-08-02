@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import styles from './headerSelect.module.css';
 
 type PropTypes = {
     headers: string[],
-    onFinishPicking: (indices: [number, number]) => void
+    onChange: (indices: [number, number]) => void
 }
 
 type HeaderState = {
@@ -14,20 +14,18 @@ type HeaderState = {
 
 const HeaderSelect: React.FC<PropTypes> = ({
     headers,
-    onFinishPicking,
+    onChange,
 }) => {
-    const [headerIndex, setHeaderIndex] = useState<HeaderState>({
-        yIndex: null,
-        xIndex: null,
-    });
+    const [xIndex, setXIndex] = useState<number>();
+    const [yIndex, setYIndex] = useState<number>();
+
+    useEffect(() => {
+        onChange([xIndex, yIndex]);
+    }, [xIndex, yIndex]);
 
     const xChoices = headers.map((header, index) => {
-        const onChange = (event) => {
-            const newXIndex = event.target.value;
-            setHeaderIndex((prevState) => ({
-                xIndex: newXIndex,
-                yIndex: prevState.yIndex,
-            }));
+        const onXChange = (event) => {
+            setXIndex(event.target.value);
         };
 
         return (
@@ -41,19 +39,15 @@ const HeaderSelect: React.FC<PropTypes> = ({
                     id={`x_${header}`}
                     name="x_axis"
                     value={index}
-                    onChange={onChange}
+                    onChange={onXChange}
                 />
             </label>
         );
     });
 
     const yChoices = headers.map((header, index) => {
-        const onChange = (event) => {
-            const newYIndex = event.target.value;
-            setHeaderIndex((prevState) => ({
-                xIndex: prevState.xIndex,
-                yIndex: newYIndex,
-            }));
+        const onYChange = (event) => {
+            setYIndex(event.target.value);
         };
 
         return (
@@ -67,31 +61,22 @@ const HeaderSelect: React.FC<PropTypes> = ({
                     id={`y_${header}`}
                     name="y_axis"
                     value={index}
-                    onChange={onChange}
+                    onChange={onYChange}
                 />
             </label>
         );
     });
 
-    const onButtonClick = () => {
-        onFinishPicking([headerIndex.xIndex, headerIndex.yIndex]);
-    };
-
     return (
         <div className={styles.container}>
-            <div className={styles.axisPickerContainer}>
-                <div className={styles.axisPicker}>
-                    <h3>X-Axis (Time Axis)</h3>
-                    {xChoices}
-                </div>
-                <div className={styles.axisPicker}>
-                    <h3>Y-Axis</h3>
-                    {yChoices}
-                </div>
+            <div className={styles.axisPicker}>
+                <h3>X-Axis (Time Axis)</h3>
+                {xChoices}
             </div>
-            <button type="button" onClick={onButtonClick}>
-                Done
-            </button>
+            <div className={styles.axisPicker}>
+                <h3>Y-Axis</h3>
+                {yChoices}
+            </div>
         </div>
     );
 };
