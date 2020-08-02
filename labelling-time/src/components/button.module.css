@@ -1,0 +1,26 @@
+.button {
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    transition: 0.1s;
+}
+
+.button:hover {
+    box-shadow: 0px 8px 6px rgba(0, 0, 0, 0.16);
+}
+
+.button:active {
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.16) inset;
+}
+
+.primary {
+    color: white;
+    background-color: #64D701;
+}
+
+.secondary {
+    color: white;
+    background-color: grey;
+}
