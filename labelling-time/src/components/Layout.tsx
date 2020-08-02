@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import SEO from './SEO';
 import './layout.css';
 
 type PropTypes = {
+    title: string,
     children: React.ReactNode,
 }
 
-const Layout: React.FC<PropTypes> = ({ children }) => (
+const Layout: React.FC<PropTypes> = ({ title, children }) => (
     <div
         style={{
             height: '100%',
@@ -22,7 +24,10 @@ const Layout: React.FC<PropTypes> = ({ children }) => (
                 flexGrow: 1,
             }}
         >
-            <main>{children}</main>
+            <main>
+                <SEO title={title} />
+                {children}
+            </main>
         </div>
     </div>
 );
