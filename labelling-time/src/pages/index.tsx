@@ -46,20 +46,49 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
     }, [fileData]);
 
     // Step 1: Upload file
+    let filenameElement;
+    if (state.filename !== null) {
+        filenameElement = (
+            <p>
+                You have uploaded:
+                {' '}
+                {state.filename}
+            </p>
+        );
+    }
+
+    const fileNextCondition = !!(state.file && !state.error);
     const onUpload = (files: FileList) => {
         dispatch({
             type: 'upload_file',
+            filename: files.item(0).name,
             file: files.item(0),
         });
     };
 
     // Step 2: Select columns to use for each axis
-    const axisNextCondition = !!(state.columnIndices
-        && state.columnIndices[0] && state.columnIndices[1]);
+    const axisNextCondition = !!(
+        state.columnIndices
+        && state.columnIndices[0] !== null && state.columnIndices[0] !== undefined
+        && state.columnIndices[1] !== null && state.columnIndices[1] !== undefined
+    );
     const onAxisValChange = (indices: [number, number]) => {
         dispatch({
             type: 'set_column_indices',
             columnIndices: indices,
+        });
+    };
+
+    // Step 3: Specify date parsing format
+    let sampleDate: string;
+    if (fileData?.status === 'success' && axisNextCondition) {
+        sampleDate = fileData.data[1][state.columnIndices[0]];
+    }
+
+    const onDateFormatChange = (event) => {
+        dispatch({
+            type: 'set_date_format',
+            dateFormat: event.target.value,
         });
     };
 
@@ -77,6 +106,21 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
             }
         }
     );
+
+    // Complete
+    if (state.step === 3) {
+        navigate(
+            '/label',
+            {
+                state: {
+                    filename: state.filename,
+                    fileData: state.fileData,
+                    columns: state.columnIndices,
+                    dateFormat: state.dateFormat,
+                },
+            },
+        );
+    }
 
     // Create functions to open other pages
     const { site: { siteMetadata: { githubURL } } } = data;
@@ -130,9 +174,10 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                     <CardStep
                         stepNum="1"
                         className={styles.stepBody}
-                        onNext={onNext(state.file, 'Please select a file')}
+                        onNext={onNext(fileNextCondition, 'Please select a valid file')}
                     >
                         <p>Upload your CSV file</p>
+                        {filenameElement}
                         <FileUpload id="data_file" onUpload={onUpload} />
                     </CardStep>
                     <CardStep
@@ -152,7 +197,12 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                         onNext={onNext(state.dateFormat, 'Please provide a date format')}
                     >
                         <p>Please specify how the date should be parsed.</p>
-                        <input type="text" />
+                        <p>
+                            From your data:
+                            {' '}
+                            {sampleDate}
+                        </p>
+                        <input type="text" onChange={onDateFormatChange} />
                     </CardStep>
                 </CardProcess>
             </div>

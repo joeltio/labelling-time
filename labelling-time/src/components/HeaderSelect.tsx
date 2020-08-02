@@ -25,7 +25,7 @@ const HeaderSelect: React.FC<PropTypes> = ({
 
     const xChoices = headers.map((header, index) => {
         const onXChange = (event) => {
-            setXIndex(event.target.value);
+            setXIndex(parseInt(event.target.value, 10));
         };
 
         return (
@@ -47,7 +47,7 @@ const HeaderSelect: React.FC<PropTypes> = ({
 
     const yChoices = headers.map((header, index) => {
         const onYChange = (event) => {
-            setYIndex(event.target.value);
+            setYIndex(parseInt(event.target.value, 10));
         };
 
         return (

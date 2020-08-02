@@ -20,6 +20,7 @@ interface NextStepAction extends _Action {
 
 interface UploadFileAction extends _Action {
     type: 'upload_file',
+    filename: string,
     file: File,
 }
 
@@ -42,18 +43,20 @@ type Action = ResetAction | ErrorAction | NextStepAction | UploadFileAction
     | LoadFileDataAction | SetColumnIndicesAction | SetDateFormatAction
 
 type State = {
+    filename: string,
     file: File | null,
     fileData: CSVEntry[] | null,
-    columnIndices: [number, number] | null,
+    columnIndices: [number | null, number | null],
     dateFormat: string | null,
     step: number,
     error: string | null,
 }
 
-const intialState = {
+const initialState: State = {
+    filename: null,
     file: null,
     fileData: null,
-    columnIndices: null,
+    columnIndices: [null, null],
     dateFormat: null,
     step: 0,
     error: null,
@@ -62,7 +65,7 @@ const intialState = {
 function reducer(state: State, action: Action): State {
     switch (action.type) {
     case 'reset':
-        return intialState;
+        return initialState;
     case 'error':
         return {
             ...state,
@@ -75,33 +78,29 @@ function reducer(state: State, action: Action): State {
         };
     case 'upload_file':
         return {
-            ...state,
+            ...initialState,
+            filename: action.filename,
             file: action.file,
-            fileData: null,
-            columnIndices: null,
-            dateFormat: null,
-            error: null,
         };
     case 'load_file_data':
         return {
-            ...state,
+            ...initialState,
+            filename: state.filename,
+            file: state.file,
             fileData: action.fileData,
-            columnIndices: null,
-            dateFormat: null,
-            error: null,
         };
     case 'set_column_indices':
         return {
             ...state,
             columnIndices: action.columnIndices,
-            dateFormat: null,
-            error: null,
+            dateFormat: initialState.dateFormat,
+            error: initialState.error,
         };
     case 'set_date_format':
         return {
             ...state,
             dateFormat: action.dateFormat,
-            error: null,
+            error: initialState.error,
         };
     default:
         throw new TypeError('Invalid action type.');
@@ -109,7 +108,7 @@ function reducer(state: State, action: Action): State {
 }
 
 function useIndexPageReducer() {
-    return useReducer(reducer, intialState);
+    return useReducer(reducer, initialState);
 }
 
 export default useIndexPageReducer;
