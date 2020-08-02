@@ -2,15 +2,14 @@ import React, { useEffect } from 'react';
 import { PageProps, graphql, navigate } from 'gatsby';
 
 import Layout from '../components/Layout';
-import SEO from '../components/SEO';
-import Card from '../components/Card';
-import CardStep from '../components/CardStep';
+import { Card, CardProcess, CardStep } from '../components/Card';
 import FileUpload from '../components/FileUpload';
 
-import styles from './index.module.css';
 import { useCSVFile } from '../utils/parseCSV';
 import useIndexPageReducer from '../reducers/indexPage';
 import HeaderSelect from '../components/HeaderSelect';
+
+import styles from './index.module.css';
 
 type DataProps = {
     site: {
@@ -21,10 +20,11 @@ type DataProps = {
 }
 
 const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
-    // const [file, setFile] = useState<File | null>(null);
+    // Create hooks for handling each step's data
     const [state, dispatch] = useIndexPageReducer();
     const fileData = useCSVFile(state.file, 'utf-8');
 
+    // This hook inserts the useCSVFile hook into the reducer
     useEffect(() => {
         if (fileData === null) {
             return () => {};
@@ -45,6 +45,7 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
         return () => {};
     }, [fileData]);
 
+    // Step 1: Upload file
     const onUpload = (files: FileList) => {
         dispatch({
             type: 'upload_file',
@@ -52,10 +53,17 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
         });
     };
 
-    const onFinishPicking = (indices) => {
+    // Step 2: Select columns to use for each axis
+    const onAxisValChange = (indices: [number, number]) => {
         dispatch({
             type: 'set_column_indices',
             columnIndices: indices,
+        });
+    };
+
+    const onNext = () => {
+        dispatch({
+            type: 'next_step',
         });
     };
 
@@ -70,8 +78,7 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
     };
 
     return (
-        <Layout>
-            <SEO title="Home" />
+        <Layout title="Home">
             <div className={styles.container}>
                 <h1>Labelling Time</h1>
                 <div className={styles.content}>
@@ -102,32 +109,37 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                         GitHub
                     </Card>
                 </div>
-                <CardStep step={state.step} className={styles.cardStep}>
-                    <div>
-                        <h2>Step 1</h2>
-                        <div className={styles.stepBody}>
-                            <p>Upload your CSV file</p>
-                            <FileUpload id="data_file" onUpload={onUpload} />
-                        </div>
-                    </div>
-                    <div>
-                        <h2>Step 2</h2>
-                        <div className={styles.stepBody}>
-                            <p>Pick the axis</p>
-                            <HeaderSelect
-                                headers={fileData?.status === 'success' ? fileData.data[0] : []}
-                                onFinishPicking={onFinishPicking}
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <h2>Step 3</h2>
-                        <div className={styles.stepBody}>
-                            <p>How should the date be parsed?</p>
-                            <input type="text" />
-                        </div>
-                    </div>
-                </CardStep>
+
+                {/* Process Data */}
+                <CardProcess step={state.step} className={styles.cardStep}>
+                    <CardStep
+                        stepNum="1"
+                        className={styles.stepBody}
+                        onNext={onNext}
+                    >
+                        <p>Upload your CSV file</p>
+                        <FileUpload id="data_file" onUpload={onUpload} />
+                    </CardStep>
+                    <CardStep
+                        stepNum="2"
+                        className={styles.stepBody}
+                        onNext={onNext}
+                    >
+                        <p>Pick the columns in your CSV file to use as the X and Y axes.</p>
+                        <HeaderSelect
+                            headers={fileData?.status === 'success' ? fileData.data[0] : []}
+                            onChange={onAxisValChange}
+                        />
+                    </CardStep>
+                    <CardStep
+                        stepNum="3"
+                        className={styles.stepBody}
+                        onNext={onNext}
+                    >
+                        <p>Please specify how the date should be parsed.</p>
+                        <input type="text" />
+                    </CardStep>
+                </CardProcess>
             </div>
         </Layout>
     );

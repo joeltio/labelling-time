@@ -14,6 +14,10 @@ interface ErrorAction extends _Action {
     errorMessage: string,
 }
 
+interface NextStepAction extends _Action {
+    type: 'next_step',
+}
+
 interface UploadFileAction extends _Action {
     type: 'upload_file',
     file: File,
@@ -34,8 +38,8 @@ interface SetDateFormatAction extends _Action {
     dateFormat: string,
 }
 
-type Action = ResetAction | ErrorAction | UploadFileAction | LoadFileDataAction
-    | SetColumnIndicesAction | SetDateFormatAction;
+type Action = ResetAction | ErrorAction | NextStepAction | UploadFileAction
+    | LoadFileDataAction | SetColumnIndicesAction | SetDateFormatAction
 
 type State = {
     file: File | null,
@@ -64,14 +68,19 @@ function reducer(state: State, action: Action): State {
             ...state,
             error: action.errorMessage,
         };
+    case 'next_step':
+        return {
+            ...state,
+            step: state.step + 1,
+        };
     case 'upload_file':
         return {
+            ...state,
             file: action.file,
             fileData: null,
             columnIndices: null,
             dateFormat: null,
             error: null,
-            step: 1,
         };
     case 'load_file_data':
         return {
@@ -80,7 +89,6 @@ function reducer(state: State, action: Action): State {
             columnIndices: null,
             dateFormat: null,
             error: null,
-            step: 1,
         };
     case 'set_column_indices':
         return {
@@ -88,14 +96,12 @@ function reducer(state: State, action: Action): State {
             columnIndices: action.columnIndices,
             dateFormat: null,
             error: null,
-            step: 2,
         };
     case 'set_date_format':
         return {
             ...state,
             dateFormat: action.dateFormat,
             error: null,
-            step: 3,
         };
     default:
         throw new TypeError('Invalid action type.');
