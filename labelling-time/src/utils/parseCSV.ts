@@ -81,10 +81,17 @@ function useCSVFile(
     // result, React will render indefinitely
     useEffect(() => {
         if (fileResult?.status === 'success') {
-            setResult({
-                status: 'success',
-                data: parseCSV(fileResult.data),
-            });
+            try {
+                setResult({
+                    status: 'success',
+                    data: parseCSV(fileResult.data),
+                });
+            } catch (e) {
+                setResult({
+                    status: 'failed',
+                    error: e,
+                });
+            }
         } else {
             setResult(fileResult);
         }
