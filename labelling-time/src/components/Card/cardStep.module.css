@@ -1,0 +1,16 @@
+.container {
+
+}
+
+.buttonContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.nextButton {
+    margin-left: auto;
+}
+
+.prevButton {
+    margin-right: auto;
+}

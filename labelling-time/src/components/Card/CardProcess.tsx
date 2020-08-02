@@ -8,7 +8,7 @@ type PropTypes = {
     className?: string,
 }
 
-const CardStep: React.FC<PropTypes> = ({
+const CardProcess: React.FC<PropTypes> = ({
     children,
     step,
     className,
@@ -23,4 +23,4 @@ const CardStep: React.FC<PropTypes> = ({
     );
 };
 
-export default CardStep;
+export default CardProcess;
