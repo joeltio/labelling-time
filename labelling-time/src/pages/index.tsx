@@ -54,6 +54,8 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
     };
 
     // Step 2: Select columns to use for each axis
+    const axisNextCondition = !!(state.columnIndices
+        && state.columnIndices[0] && state.columnIndices[1]);
     const onAxisValChange = (indices: [number, number]) => {
         dispatch({
             type: 'set_column_indices',
@@ -61,11 +63,20 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
         });
     };
 
-    const onNext = () => {
-        dispatch({
-            type: 'next_step',
-        });
-    };
+    const onNext = (val: any, errorMessage: string) => (
+        () => {
+            if (val === null || val === false) {
+                dispatch({
+                    type: 'error',
+                    errorMessage,
+                });
+            } else {
+                dispatch({
+                    type: 'next_step',
+                });
+            }
+        }
+    );
 
     // Create functions to open other pages
     const { site: { siteMetadata: { githubURL } } } = data;
@@ -111,11 +122,15 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                 </div>
 
                 {/* Process Data */}
-                <CardProcess step={state.step} className={styles.cardStep}>
+                <CardProcess
+                    step={state.step}
+                    className={styles.cardStep}
+                    error={state.error}
+                >
                     <CardStep
                         stepNum="1"
                         className={styles.stepBody}
-                        onNext={onNext}
+                        onNext={onNext(state.file, 'Please select a file')}
                     >
                         <p>Upload your CSV file</p>
                         <FileUpload id="data_file" onUpload={onUpload} />
@@ -123,7 +138,7 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                     <CardStep
                         stepNum="2"
                         className={styles.stepBody}
-                        onNext={onNext}
+                        onNext={onNext(axisNextCondition, 'Please select the axes')}
                     >
                         <p>Pick the columns in your CSV file to use as the X and Y axes.</p>
                         <HeaderSelect
@@ -134,7 +149,7 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                     <CardStep
                         stepNum="3"
                         className={styles.stepBody}
-                        onNext={onNext}
+                        onNext={onNext(state.dateFormat, 'Please provide a date format')}
                     >
                         <p>Please specify how the date should be parsed.</p>
                         <input type="text" />
