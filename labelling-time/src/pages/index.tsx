@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { PageProps, graphql, navigate } from 'gatsby';
 
 import Layout from '../components/Layout';
@@ -9,6 +9,7 @@ import FileUpload from '../components/FileUpload';
 
 import styles from './index.module.css';
 import { useCSVFile } from '../utils/parseCSV';
+import useIndexPageReducer from '../reducers/indexPage';
 import HeaderSelect from '../components/HeaderSelect';
 
 type DataProps = {
@@ -20,18 +21,43 @@ type DataProps = {
 }
 
 const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
-    const [step, setStep] = useState<number>(0);
-    const [file, setFile] = useState<File | null>(null);
-    const fileData = useCSVFile(file, 'utf-8');
+    // const [file, setFile] = useState<File | null>(null);
+    const [state, dispatch] = useIndexPageReducer();
+    const fileData = useCSVFile(state.file, 'utf-8');
+
+    useEffect(() => {
+        if (fileData === null) {
+            return () => {};
+        }
+
+        switch (fileData.status) {
+        case 'success':
+            dispatch({ type: 'load_file_data', fileData: fileData.data });
+            break;
+        case 'failed':
+            dispatch({ type: 'error', errorMessage: fileData.error.message });
+            break;
+        default:
+            // Do nothing
+            break;
+        }
+
+        return () => {};
+    }, [fileData]);
 
     const onUpload = (files: FileList) => {
-        setFile(files.item(0));
-        setStep(1);
+        dispatch({
+            type: 'upload_file',
+            file: files.item(0),
+        });
     };
 
-    if (fileData !== null && fileData.status === 'success') {
-        console.log(fileData.data[0]);
-    }
+    const onFinishPicking = (indices) => {
+        dispatch({
+            type: 'set_column_indices',
+            columnIndices: indices,
+        });
+    };
 
     // Create functions to open other pages
     const { site: { siteMetadata: { githubURL } } } = data;
@@ -76,7 +102,7 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                         GitHub
                     </Card>
                 </div>
-                <CardStep step={step} className={styles.cardStep}>
+                <CardStep step={state.step} className={styles.cardStep}>
                     <div>
                         <h2>Step 1</h2>
                         <div className={styles.stepBody}>
@@ -88,6 +114,17 @@ const Home: React.FC<PageProps<DataProps>> = ({ data }) => {
                         <h2>Step 2</h2>
                         <div className={styles.stepBody}>
                             <p>Pick the axis</p>
+                            <HeaderSelect
+                                headers={fileData?.status === 'success' ? fileData.data[0] : []}
+                                onFinishPicking={onFinishPicking}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <h2>Step 3</h2>
+                        <div className={styles.stepBody}>
+                            <p>How should the date be parsed?</p>
+                            <input type="text" />
                         </div>
                     </div>
                 </CardStep>

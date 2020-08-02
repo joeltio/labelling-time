@@ -1,9 +1,7 @@
 import parse from 'csv-parse/lib/sync';
 import { useState, useEffect } from 'react';
 
-type CSVEntry = {
-    [key: string]: string
-}
+type CSVEntry = string[]
 
 type Encoding = 'utf-8' | 'utf-16'
 
@@ -76,23 +74,31 @@ function useCSVFile(
     file: File | null,
     encoding: Encoding,
 ): FileResult<CSVEntry[]> | null {
-    const result = useFile(file, encoding);
+    const fileResult = useFile(file, encoding);
+    const [result, setResult] = useState<FileResult<CSVEntry[]> | null>(null);
 
-    if (result === null) {
-        return null;
-    }
-
-    if (result.status === 'success') {
-        // Convert the data to CSV entries
-        return {
-            status: result.status,
-            data: parseCSV(result.data),
-        };
-    }
+    // It seems that without having a separate state hook for the transformed
+    // result, React will render indefinitely
+    useEffect(() => {
+        if (fileResult?.status === 'success') {
+            setResult({
+                status: 'success',
+                data: parseCSV(fileResult.data),
+            });
+        } else {
+            setResult(fileResult);
+        }
+    }, [fileResult]);
 
     return result;
 }
 
 export {
     useCSVFile,
+    useFile,
+};
+
+export type {
+    CSVEntry,
+    FileResult,
 };
